@@ -3,7 +3,7 @@ const router = new express.Router()
 
 const Player = require('../models/player')
 
-router.get('/players', async (req, res) =>{
+router.get('/', async (req, res) =>{
     try{
         const players = await Player.find({})
         res.send(players)
@@ -12,7 +12,7 @@ router.get('/players', async (req, res) =>{
     }
 })
 
-router.get('/players/:id', async(req, res)=>{
+router.get('/:id', async(req, res)=>{
     const _id = req.params.id
     try{
         const player = await Player.findById(_id)
@@ -24,7 +24,7 @@ router.get('/players/:id', async(req, res)=>{
     }
 })
 
-router.post('/players', async(req,res)=>{
+router.post('/', async(req,res)=>{
     console.log(req.body)
     const player = new Player(req.body)
     try{
@@ -37,7 +37,7 @@ router.post('/players', async(req,res)=>{
 })
 
 
-router.delete('/players/:id',async (req,res)=>{
+router.delete('/:id',async (req,res)=>{
     const _id = req.params.id
     try {
         const player = await Player.findByIdAndDelete(_id);
@@ -48,3 +48,5 @@ router.delete('/players/:id',async (req,res)=>{
     }
 
 })
+
+module.exports = router;
