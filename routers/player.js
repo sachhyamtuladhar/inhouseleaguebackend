@@ -5,8 +5,8 @@ const Player = require('../models/player')
 
 router.get('/players', async (req, res) =>{
     try{
-        const friends = await Friend.find({})
-        res.send(friends)
+        const players = await Player.find({})
+        res.send(players)
     }catch(e){
         res.status(500).send(e)
     }
@@ -29,7 +29,7 @@ router.post('/players', async(req,res)=>{
     const player = new Player(req.body)
     try{
         await player.save()
-        res.status(201).send(friend)
+        res.status(201).send(player)
     }catch(e){
         console.log(e)
         res.status(400).send(e)
@@ -37,7 +37,7 @@ router.post('/players', async(req,res)=>{
 })
 
 
-router.delete('/friends/:id',async (req,res)=>{
+router.delete('/players/:id',async (req,res)=>{
     const _id = req.params.id
     try {
         const player = await Player.findByIdAndDelete(_id);

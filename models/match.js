@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const validator = require('validator')
 
 const matchSchema = new mongoose.Schema({
     matchName:{
