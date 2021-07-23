@@ -23,8 +23,8 @@ const app = express();
 
 app.use(express.json());
 
-app.use(playerRouter)
-app.use(matchRouter)
+app.use('/players',playerRouter)
+app.use('/matches',matchRouter)
 
 app.use((req, res) => {
     res.render('404', {
