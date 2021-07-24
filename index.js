@@ -9,37 +9,28 @@ dotenv.config({
 
 require('./db/mongoose');
 
-
-
-const Match = require('./models/match');
-const Player = require('./models/player');
+const cors = require('cors')
 
 const playerRouter = require('./routers/player');
 const matchRouter = require('./routers/match');
 
 const app = express();
 
+app.use(cors())
+
 
 
 app.use(express.json());
 
-app.use('/players',playerRouter)
-app.use('/matches',matchRouter)
+app.use('/players', playerRouter)
+app.use('/matches', matchRouter)
 
 app.use((req, res) => {
-    res.render('404', {
-        path: req.url
-    })
-})
-
-app.use((error,req,res,next)=>{
-    res.status(400).render('error',{
-        msg: error
-    })
+    res.status(404).send()
 })
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3006;
 
 app.listen(port,function(err,done){
     if(err){

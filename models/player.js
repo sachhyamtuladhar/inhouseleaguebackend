@@ -3,8 +3,7 @@ const mongoose = require('mongoose')
 const playerSchema = new mongoose.Schema({
     nickname:{
         type: String,
-        trim: true,
-        required: true
+        trim: true
     },
     steamID:{
         type: String,
