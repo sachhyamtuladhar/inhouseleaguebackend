@@ -36,30 +36,35 @@ const matchSchema = new mongoose.Schema({
         ref: 'Player',
         required: true
     },
-    direlayer1:{
+    direPlayer1:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Player',
         required: true
     },
-    direlayer2:{
+    direPlayer2:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Player',
         required: true
     },
-    direlayer3:{
+    direPlayer3:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Player',
         required: true
     },
-    direlayer4:{
+    direPlayer4:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Player',
         required: true
     },
-    direlayer5:{
+    direPlayer5:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Player',
         required: true
+    },
+    status:{
+        type: String,
+        enum : ['UNKNOWN', 'STARTED', 'RADIANTVICTORY', 'DIREVICTORY'],
+        default: 'UNKNOWN'
     }
 })
 

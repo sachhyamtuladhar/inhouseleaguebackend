@@ -18,7 +18,9 @@ router.get('/', async (req, res) => {
                 status: output.personastate,
                 id: player._id,
                 name: output.personaname,
-                image: output.avatar
+                image: output.avatar,
+                wins: player.wins,
+                games: player.games
             }
             playersInfo.push(playerInfo)
         }
@@ -83,6 +85,50 @@ router.delete('/:id', async (req, res) => {
         return res.sendStatus(400).send(e);
     }
 
+})
+
+router.patch('/:id', async (req, res) => {
+    const allowedUpdates = ['nickname']
+    updatesValid = updates.every(update=>allowedUpdates.includes(update))
+    if(!updatesValid)
+        res.status(400).send('Error: Invalid Updates! You can only upodate nickname!')
+
+    try {
+        const _id = req.params.id
+        const match = await Match.findByIdAndUpdate(_id, req.body, {new: true, runValidators: true})
+        if(!match)
+            res.status(404).send()
+        res.send(match)
+      
+    }catch(e){
+        res.status(400).send(e)
+    }
+})
+
+router.patch('/:id/radvictory', async (req, res) => {
+    const _id = req.params.id
+    try {
+        const match = await Match.findById(_id, {status:'RADIANTVICTORY'}, {new: true, runValidators: true})
+        if(!match)
+            res.status(404).send()
+        res.send(match)
+      
+    }catch(e){
+        res.status(400).send(e)
+    }
+})
+
+router.patch('/:id/direvictory', async (req, res) => {
+    const _id = req.params.id
+    try {
+        const match = await Match.findById(_id, {status:'DIREVICTORY'}, {new: true, runValidators: true})
+        if(!match)
+            res.status(404).send()
+        res.send(match)
+      
+    }catch(e){
+        res.status(400).send(e)
+    }
 })
 
 module.exports = router;
