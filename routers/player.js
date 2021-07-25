@@ -25,8 +25,11 @@ router.get('/:id', async(req, res)=>{
 })
 
 router.post('/', async(req,res)=>{
-    console.log(req.body)
-    const player = new Player(req.body)
+    const player = new Player({
+        ...req.body,
+        wins: 0,
+        games: 0
+    })
     try{
         await player.save()
         res.status(201).send(player)
