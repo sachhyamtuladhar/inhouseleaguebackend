@@ -1,8 +1,9 @@
 const router = require('express').Router()
+const { findById } = require('../models/match')
 const Match = require('../models/match')
 const Player = require('../models/player')
 
-router.route('/').get(async (req,res,next)=>{
+router.route('/').get(async (req, res, next) => {
     try {
         const matches = await Match.find({})
         res.send(matches)
@@ -11,7 +12,7 @@ router.route('/').get(async (req,res,next)=>{
     }
 })
 
-router.route('/start').post(async (req,res,next)=>{
+router.route('/start').post(async (req, res, next) => {
     const match = new Match({
         matchName: 'TEST MATCH',
         radPlayer1: req.body.radPlayers[0].id,
@@ -27,72 +28,125 @@ router.route('/start').post(async (req,res,next)=>{
         status: 'STARTED'
     })
     try {
-      await match.save();
-      res.status(201).send(match)
+        await match.save();
+        res.status(201).send(match)
     } catch (e) {
         res.status(500).send(e)
     }
 })
 
-router.route('/:id/radVictory').patch(async (req,res,next)=>{
+router.route('/:id/radVictory').patch(async (req, res, next) => {
     try {
-        let match = await Match.findById(req.params.id)
-        if (match.status === 'STARTED'){
-            match = await Match.findByIdAndUpdate(match, {$set:{status: 'RADIANTVICTORY'}}, {new: true, runValidators: true})
-            // Update winners
-            await Player.findByIdAndUpdate({ $in: [
-                match.radPlayer1,
-                match.radPlayer2,
-                match.radPlayer3,
-                match.radPlayer4,
-                match.radPlayer5
-            ] } , {$inc : {'wins' : 1, 'games':1}});
+
+        const match = await Match.findById(req.params.id);
+        
+        if(match.status==='STARTED'){
+            const winners = await Player.find({
+                '_id': {
+                    $in: [
+                        match.radPlayer1,
+                        match.radPlayer2,
+                        match.radPlayer3,
+                        match.radPlayer4,
+                        match.radPlayer5
+                    ]
+                }
+            })
+            for (const winner of winners){
+                winner.wins+=1
+                winner.games+=1
+                await winner.save()
+            }
+    
+            const losers = await Player.find({
+                '_id': {
+                    $in: [
+                        match.direPlayer1,
+                        match.direPlayer2,
+                        match.direPlayer3,
+                        match.direPlayer4,
+                        match.direPlayer5
+                    ]
+                }
+            })
+            for (const loser of losers){
+                loser.games+=1
+                await loser.save()
+            }
+            match.status='RADIANTVICTORY';
+            await match.save()
+            return res.status(201).send({
+                msg:'Points Added Succesfully'
+            })
             
-            // Update losers
-            await Player.findByIdAndUpdate( { $in: [
-                match.direPlayer1,
-                match.direPlayer2,
-                match.direPlayer3,
-                match.direPlayer4,
-                match.direPlayer5
-            ]  }, {$inc : {'games' : 1}});
         }
-        res.send(match)
+
+        return res.status(404).json({
+            errMsg: 'Match not found'
+        })
+
+        
+
+
     } catch (e) {
         res.status(500).send(e)
     }
 })
 
-router.route('/:id/direVictory').patch(async (req,res,next)=>{
+router.route('/:id/direVictory').patch(async (req, res, next) => {
     try {
-        let match = await Match.findById(req.params.id)
 
-        if (match.status === 'STARTED'){
-            match = await Match.findByIdAndUpdate(req.params.id, {$set:{status: 'DIREVICTORY'}}, {new: true, runValidators: true})
+        const match = await Match.findById(req.params.id);
+        
+        if(match.status==='STARTED'){
+            const winners = await Player.find({
+                '_id': {
+                    $in: [
+                        match.direPlayer1,
+                        match.direPlayer2,
+                        match.direPlayer3,
+                        match.direPlayer4,
+                        match.direPlayer5
+                    ]
+                }
+            })
+            for (const winner of winners){
+                winner.wins+=1
+                winner.games+=1
+                await winner.save()
+            }
+    
+            const losers = await Player.find({
+                '_id': {
+                    $in: [
+                        match.radPlayer1,
+                        match.radPlayer2,
+                        match.radPlayer3,
+                        match.radPlayer4,
+                        match.radPlayer5
+                    ]
+                }
+            })
+            for (const loser of losers){
+                loser.games+=1
+                await loser.save()
+            }
+            match.status='DIREVICTORY';
+            await match.save()
             
-            // Update winners
-            await Player.findByIdAndUpdate ( 
-                { $in: [
-                    match.direPlayer1,
-                    match.direPlayer2,
-                    match.direPlayer3,
-                    match.direPlayer4,
-                    match.direPlayer5
-                ] } 
-            , {$inc : {'wins' : 1, 'games':1}});
+            return res.status(201).send({
+                msg:'Points Added Succesfully'
+            })
             
-            // Update losers
-            await Player.findByIdAndUpdate (
-                { $in: [
-                    match.radPlayer1,
-                    match.radPlayer2,
-                    match.radPlayer3,
-                    match.radPlayer4,
-                    match.radPlayer5
-                ] }
-             , {$inc : {'games' : 1}});
         }
-        res.send(match)
+
+        return res.status(404).json({
+            errMsg: 'Match not found'
+        })
+
+        
+
+
     } catch (e) {
         res.status(500).send(e)
     }

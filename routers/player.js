@@ -33,6 +33,34 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.get('/sort/:order', async (req, res) => {
+    try {
+
+        let order = req.params.order
+        const players = await Player.find({}).sort({wins:order})
+        const playersInfo = [];
+        for (const player of players) {
+            const { data } = await axios.get(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${process.env.STEAM_API_KEY}&format=json&steamids=${player.steamID}`);
+            const output = data.response.players[0];
+            const playerInfo = {
+                status: output.personastate,
+                id: player._id,
+                name: output.personaname,
+                image: output.avatar,
+                wins: player.wins,
+                games: player.games
+            }
+            playersInfo.push(playerInfo)
+        }
+        res.status(201).json({
+            data: playersInfo,
+            msg: 'Success retrieving players'
+        })
+    } catch (e) {
+        res.status(500).send(e)
+    }
+})
+
 router.get('/:id', async (req, res) => {
     const _id = req.params.id
     try {
